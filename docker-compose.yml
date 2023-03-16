@@ -1,0 +1,43 @@
+version: "3"
+services:
+  db:
+    image: mysql:5.7
+    platform: linux/amd64
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    # ports:
+    #   - 3306:3306
+    networks:
+      - wordpress
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    platform: linux/amd64
+    restart: always
+    volumes:
+      - ./:/var/www/html/wp-content
+      - ./assets:/var/www/html/assets
+      - ./upload.ini:/usr/local/etc/php/conf.d/upload.ini
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      # WORDPRESS_DEBUG: 1
+    ports:
+      - 8080:80
+    networks:
+      - wordpress
+
+networks:
+  wordpress:
+
+volumes:
+  db:
